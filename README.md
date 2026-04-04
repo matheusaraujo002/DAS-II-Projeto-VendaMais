@@ -80,7 +80,9 @@ O diagrama de containers detalha a arquitetura interna da solução:
 ```
 docs/
  ├── c4/
+ │   ├── 01-context.md
  │   ├── nivel-1.png
+ │   ├── 02-container.md
  │   ├── nivel-2.png
  │
  └── adr/
