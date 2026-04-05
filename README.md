@@ -70,8 +70,8 @@ O diagrama de containers detalha a arquitetura interna da solução:
 ## 👥 Integrantes
 
 * Yohann - (https://github.com/YohannPohl)
-* Integrante 2 - link github
-* Integrante 3 - link github
+* Matheus De Araujo - (https://github.com/matheusaraujo002)
+* Guilherme Da costa - (https://github.com/GuilhermeCostaLima)
 
 ---
 
