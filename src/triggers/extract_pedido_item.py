@@ -6,12 +6,12 @@ app = func.Blueprint()
 
 
 @app.timer_trigger(schedule="0 0 6 * * *", arg_name="timer", run_on_startup=False)
-def extract_pedido(timer: func.TimerRequest) -> None:
+def extract_pedido_item(timer: func.TimerRequest) -> None:
     """
     Trigger de extração agendada (diária às 06:00 UTC).
     Apenas delega para o orchestrator — sem lógica de negócio aqui.
     """
-    logging.info("Extract Pedido iniciado.")
+    logging.info("Extract extract_pedido_item iniciado.")
     #orchestrator = ETLOrchestrator()
     #orchestrator.run_extraction()
-    logging.info("Extract Pedido finalizado.")
+    logging.info("Extract extract_pedido_item finalizado.")
