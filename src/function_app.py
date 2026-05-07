@@ -3,10 +3,10 @@ import azure.functions as func
 
 app = func.FunctionApp()
 
-@app.timer_trigger(schedule="0 */5 * * * *", arg_name="myTimer", run_on_startup=False,
-              use_monitor=False) 
-def timer_trigger_cicd(myTimer: func.TimerRequest) -> None:
-    if myTimer.past_due:
-        logging.info('The timer is past due!')
+# Importa triggers para registrar as functions no app
+from triggers.extract_cliente import app as extract_trigger
+from triggers.extract_entrega import app as extract_trigger
+from triggers.extract_pedido import app as extract_trigger
 
-    logging.info('Python timer trigger function executed.')
+app.register_functions(extract_trigger)
+logging.info("Azure Function App inicializado.")
