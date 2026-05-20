@@ -1,6 +1,7 @@
 import azure.functions as func
 import logging
 import pyodbc
+import os
 
 app = func.Blueprint()
 
@@ -19,9 +20,9 @@ def extract_entrega(timer: func.TimerRequest) -> None:
     conn_str = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
         f"SERVER={sql_server};"
-        f"DATABASE={sql_database};"
+        f"DATABASE={database};"
         f"UID={user};"
-        f"PWD={sql_pass};"
+        f"PWD={password};"
         "Encrypt=yes;"
         "TrustServerCertificate=no;"
         "Connection Timeout=30;"
