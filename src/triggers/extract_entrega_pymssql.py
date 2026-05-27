@@ -7,7 +7,7 @@ import time
 app = func.Blueprint()
 
 @app.timer_trigger(schedule="0 0 6 * * *", arg_name="timer", run_on_startup=False)
-def extract_entrega(timer: func.TimerRequest) -> None:
+def extract_entrega_pymssql(timer: func.TimerRequest) -> None:
 
     sql_server = os.getenv("SQL_SERVER_SOURCE")
     database = os.getenv("SQL_DATABASE_SOURCE")
