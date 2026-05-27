@@ -18,7 +18,7 @@ def extract_entrega_pymssql(timer: func.TimerRequest) -> None:
         f"Servidor: {sql_server}, Banco: {database}, Usuario: {user}"
     )
 
-    query = "SELECT * FROM erp.pedido"
+    query = "SELECT * FROM erp.entrega"
 
     tempos_execucao = []
 
