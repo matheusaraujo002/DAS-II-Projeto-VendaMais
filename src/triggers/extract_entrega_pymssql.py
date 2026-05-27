@@ -26,7 +26,7 @@ def extract_entrega_pymssql(timer: func.TimerRequest) -> None:
         # Executa o teste 2 vezes
         for i in range(2):
 
-            logging.info(f"Iniciando teste {i + 1}")
+            logging.info(f"Iniciando teste {i + 1} com pymsSQL")
 
             # Marca o tempo inicial
             inicio = time.perf_counter()
