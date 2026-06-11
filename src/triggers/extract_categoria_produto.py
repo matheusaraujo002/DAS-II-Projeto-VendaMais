@@ -119,9 +119,9 @@ def extract_categoria_produto(timer: func.TimerRequest) -> None:
             )
 
             # limpa os registros antigos
-            #cursor_dest.execute(
-            #    "DELETE FROM erp.entrega"
-            #)
+            cursor_dest.execute(
+                "DELETE FROM dbo.categoria_produto"
+            )
 
             # habilita IDENTITY
             cursor_dest.execute(
