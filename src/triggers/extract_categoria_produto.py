@@ -101,7 +101,7 @@ def extract_categoria_produto(timer: func.TimerRequest) -> None:
                 SELECT COUNT(*)
                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_SCHEMA = 'dbo'
-                AND TABLE_NAME = 'entrega'
+                AND TABLE_NAME = 'categoria_produto'
             """)
 
             tabela_existe = cursor_dest.fetchone()[0]
@@ -125,7 +125,7 @@ def extract_categoria_produto(timer: func.TimerRequest) -> None:
 
             # habilita IDENTITY
             cursor_dest.execute(
-                "SET IDENTITY_INSERT dbo.entrega ON"
+                "SET IDENTITY_INSERT dbo.categoria_produto ON"
             )
 
             for row in rows:
@@ -147,7 +147,7 @@ def extract_categoria_produto(timer: func.TimerRequest) -> None:
                 """, row)
 
             cursor_dest.execute(
-                "SET IDENTITY_INSERT dbo.entrega OFF"
+                "SET IDENTITY_INSERT dbo.categoria_produto OFF"
             )
 
             conn.commit()
