@@ -78,8 +78,8 @@ def extract_categoria_produto(timer: func.TimerRequest) -> None:
 
             cursor.execute(query)
 
-            #rows = cursor.fetchall()
-            rows = cursor.fetchmany(5)
+            rows = cursor.fetchall()
+            #rows = cursor.fetchmany(5)
         tempo_extract = time.time() - inicio
 
         tempos_execucao.append(
