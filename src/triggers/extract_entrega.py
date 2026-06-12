@@ -6,23 +6,50 @@ import time
 
 app = func.Blueprint()
 
-@app.timer_trigger(schedule="0 0 6 * * *", arg_name="timer", run_on_startup=False)
+@app.timer_trigger(
+    schedule="0 0 6 * * *",
+    arg_name="timer",
+    run_on_startup=False
+)
 def extract_entrega(timer: func.TimerRequest) -> None:
 
+    # Banco Cris
     sql_server = os.getenv("SQL_SERVER_SOURCE")
     database = os.getenv("SQL_DATABASE_SOURCE")
     user = os.getenv("SQL_USER_SOURCE")
     password = os.getenv("SQL_PASSWORD_SOURCE")
 
+    # Meu
+    sql_server_dest = os.getenv("SQL_SERVER_456")
+    database_dest = os.getenv("SQL_DATABASE_SOURCE_456")
+    user_dest = os.getenv("SQL_DATABASE_USER")
+    password_dest = os.getenv("SQL_DATABASE_PASSWORD")
+
     logging.info(
-        f"Servidor: {sql_server}, Banco: {database}, Usuario: {user}"
+        f"Servidor origem: {sql_server}, Banco: {database}"
     )
 
-    query = "SELECT * FROM erp.entrega"
+    query = """
+    SELECT
+        id_entrega,
+        id_pedido,
+        id_transportadora,
+        id_regiao,
+        dt_prometida,
+        dt_entrega,
+        ds_status_entrega,
+        cd_rastreio,
+        ds_observacao,
+        dt_inclusao,
+        dt_atualizacao,
+        nm_sistema_origem,
+        cd_registro_origem
+    FROM erp.entrega
+"""
 
     tempos_execucao = []
 
-    # String de conexão ODBC
+    # Cris
     conn_str = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
         f"SERVER={sql_server};"
@@ -34,48 +61,127 @@ def extract_entrega(timer: func.TimerRequest) -> None:
         "Connection Timeout=30;"
     )
 
+    # Meu
+    conn_dest = (
+        "DRIVER={ODBC Driver 18 for SQL Server};"
+        f"SERVER={sql_server_dest};"
+        f"DATABASE={database_dest};"
+        f"UID={user_dest};"
+        f"PWD={password_dest};"
+        "Encrypt=yes;"
+        "TrustServerCertificate=no;"
+        "Connection Timeout=30;"
+    )
+
     try:
 
-        # Executa 2 vezes
-        for i in range(2):
+        inicio = time.time()
 
-            logging.info(f"Iniciando teste {i + 1} com pyodbc")
+        with pyodbc.connect(conn_str) as conn:
 
-            # Marca início
-            inicio = time.perf_counter()
+            cursor = conn.cursor()
 
-            # Abre conexão
-            with pyodbc.connect(conn_str) as conn:
+            cursor.execute(query)
 
-                cursor = conn.cursor()
+            rows = cursor.fetchall()
+            #rows = cursor.fetchmany(5)
+        tempo_extract = time.time() - inicio
 
-                # Executa SELECT
-                cursor.execute(query)
-
-                # Carrega TODAS as linhas em memória
-                rows = cursor.fetchall()
-
-            # Marca fim
-            fim = time.perf_counter()
-
-            # Calcula duração
-            duracao = fim - inicio
-
-            tempos_execucao.append(duracao)
-
-            logging.info(
-                f"Teste {i + 1} concluído - "
-                f"{len(rows)} linhas carregadas em "
-                f"{duracao:.4f} segundos"
-            )
-
-        # Média
-        tempo_medio = sum(tempos_execucao) / len(tempos_execucao)
-
-        logging.info(
-            f"Tempo médio de SELECT: {tempo_medio:.4f} segundos"
+        tempos_execucao.append(
+            ("extract_entrega", tempo_extract)
         )
 
+        logging.info(
+            f"[entrega] {len(rows)} registros extraídos em {tempo_extract:.2f}s"
+        )
+
+        inicio_load = time.time()
+
+        with pyodbc.connect(conn_dest) as conn:
+
+            cursor_dest = conn.cursor()
+
+            # verifica se a tabela existe
+            cursor_dest.execute("""
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_SCHEMA = 'dbo'
+                AND TABLE_NAME = 'entrega'
+            """)
+
+            tabela_existe = cursor_dest.fetchone()[0]
+
+            if tabela_existe == 0:
+
+                logging.error(
+                    "Tabela dbo.entrega não existe no banco destino."
+                )
+
+                return
+
+            logging.info(
+                "Tabela dbo.entrega encontrada."
+            )
+
+            # limpa os registros antigos
+            cursor_dest.execute(
+                "DELETE FROM dbo.entrega"
+            )
+
+            # habilita IDENTITY
+            cursor_dest.execute(
+                "SET IDENTITY_INSERT dbo.entrega ON"
+            )
+
+            for row in rows:
+
+                cursor_dest.execute("""
+                    INSERT INTO dbo.entrega(
+                        id_entrega,
+                        id_pedido,
+                        id_transportadora,
+                        id_regiao,
+                        dt_prometida,
+                        dt_entrega,
+                        ds_status_entrega,
+                        cd_rastreio,
+                        ds_observacao,
+                        dt_inclusao,
+                        dt_atualizacao,
+                        nm_sistema_origem,
+                        cd_registro_origem
+                    )
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    )
+                """, row)
+
+            cursor_dest.execute(
+                "SET IDENTITY_INSERT dbo.entrega OFF"
+            )
+
+            conn.commit()
+
+        tempo_load = time.time() - inicio_load
+
+        tempos_execucao.append(
+            ("load_entrega", tempo_load)
+        )
+
+        logging.info(
+            f"[entrega] {len(rows)} registros carregados em {tempo_load:.2f}s"
+        )
+
+        for etapa, tempo in tempos_execucao:
+
+            logging.info(
+                f"Tempo {etapa}: {tempo:.2f}s"
+            )
+
     except Exception as e:
-        logging.error(f"Erro ao ler erp.pedido: {str(e)}")
+
+        logging.error(
+            f"[entrega] Erro: {e}"
+        )
+
         raise

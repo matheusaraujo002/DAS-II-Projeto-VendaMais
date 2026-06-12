@@ -11,7 +11,7 @@ app = func.Blueprint()
     arg_name="timer",
     run_on_startup=False
 )
-def extract_cliente(timer: func.TimerRequest) -> None:
+def extract_produto(timer: func.TimerRequest) -> None:
 
     # Banco Cris
     sql_server = os.getenv("SQL_SERVER_SOURCE")
@@ -31,22 +31,19 @@ def extract_cliente(timer: func.TimerRequest) -> None:
 
     query = """
     SELECT
-        id_cliente,
-        cd_cliente,
-        nm_cliente,
-        tp_pessoa,
-        nr_cnpj_cpf,
-        ds_email,
-        ds_telefone,
-        id_regiao,
-        id_representante,
-        dt_cadastro,
+        id_produto,
+        cd_produto,
+        cd_sku,
+        nm_produto,
+        id_categoria,
+        nm_unidade_medida,
+        qt_ponto_reposicao,
         fl_ativo,
         dt_inclusao,
         dt_atualizacao,
         nm_sistema_origem,
         cd_registro_origem
-    FROM erp.cliente
+    FROM erp.produto
     """
 
     tempos_execucao = []
@@ -90,7 +87,7 @@ def extract_cliente(timer: func.TimerRequest) -> None:
         tempo_extract = time.time() - inicio
 
         tempos_execucao.append(
-            ("extract_cliente", tempo_extract)
+            ("extract_produto", tempo_extract)
         )
 
         logging.info(
@@ -108,7 +105,7 @@ def extract_cliente(timer: func.TimerRequest) -> None:
                 SELECT COUNT(*)
                 FROM INFORMATION_SCHEMA.TABLES
                 WHERE TABLE_SCHEMA = 'dbo'
-                AND TABLE_NAME = 'cliente'
+                AND TABLE_NAME = 'produto'
             """)
 
             tabela_existe = cursor_dest.fetchone()[0]
@@ -127,39 +124,38 @@ def extract_cliente(timer: func.TimerRequest) -> None:
 
             # limpa os registros antigos
             cursor_dest.execute(
-                "DELETE FROM dbo.cliente"
+                "DELETE FROM dbo.produto"
             )
 
             # habilita IDENTITY
             cursor_dest.execute(
-                "SET IDENTITY_INSERT dbo.cliente ON"
+                "SET IDENTITY_INSERT dbo.produto ON"
             )
 
             for row in rows:
 
                 cursor_dest.execute("""
-                    INSERT INTO dbo.cliente(
-                        id_cliente,
-                        cd_cliente,
-                        nm_cliente,
-                        tp_pessoa,
-                        nr_cnpj_cpf,
-                        ds_email,
-                        ds_telefone,
-                        id_regiao,
-                        id_representante,
-                        dt_cadastro,
+                    INSERT INTO dbo.produto(
+                        id_produto,
+                        cd_produto,
+                        cd_sku,
+                        nm_produto,
+                        id_categoria,
+                        nm_unidade_medida,
+                        qt_ponto_reposicao,
                         fl_ativo,
                         dt_inclusao,
                         dt_atualizacao,
                         nm_sistema_origem,
                         cd_registro_origem
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    )
                 """, row)
 
             cursor_dest.execute(
-                "SET IDENTITY_INSERT dbo.cliente OFF"
+                "SET IDENTITY_INSERT dbo.produto OFF"
             )
 
             conn.commit()
