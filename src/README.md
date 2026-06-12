@@ -35,8 +35,8 @@ Foram criadas Azure Functions responsáveis por:
 - pyodbc
 
 ## Evidências Banco 
-![Estoque Movimentação](src/docs/images/estoque_movimentacao.png)
-![Relacionamento](src/docs/images/relacionamento.png)
+![Estoque Movimentação](DAS-II-Projeto-VendaMais/src/docs/images/estoque_movimentacao.png)
+![Relacionamento](DAS-II-Projeto-VendaMais/src/docs/images/relacionamento.png)
 
 ## Resultado
 
