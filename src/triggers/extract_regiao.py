@@ -86,7 +86,7 @@ def extract_regiao(timer: func.TimerRequest) -> None:
         )
 
         logging.info(
-            f"[entrega] {len(rows)} registros extraídos em {tempo_extract:.2f}s"
+            f"[regiao] {len(rows)} registros extraídos em {tempo_extract:.2f}s"
         )
 
         inicio_load = time.time()
@@ -108,19 +108,19 @@ def extract_regiao(timer: func.TimerRequest) -> None:
             if tabela_existe == 0:
 
                 logging.error(
-                    "Tabela dbo.entrega não existe no banco destino."
+                    "Tabela dbo.regiao não existe no banco destino."
                 )
 
                 return
 
             logging.info(
-                "Tabela dbo.entrega encontrada."
+                "Tabela dbo.regiao encontrada."
             )
 
             # limpa os registros antigos
-            #cursor_dest.execute(
-            #    "DELETE FROM dbo.regiao"
-            #)
+            cursor_dest.execute(
+                "DELETE FROM dbo.regiao"
+            )
 
             # habilita IDENTITY
             cursor_dest.execute(
@@ -154,11 +154,11 @@ def extract_regiao(timer: func.TimerRequest) -> None:
         tempo_load = time.time() - inicio_load
 
         tempos_execucao.append(
-            ("load_entrega", tempo_load)
+            ("load_regiao", tempo_load)
         )
 
         logging.info(
-            f"[entrega] {len(rows)} registros carregados em {tempo_load:.2f}s"
+            f"[regiao] {len(rows)} registros carregados em {tempo_load:.2f}s"
         )
 
         for etapa, tempo in tempos_execucao:
@@ -170,7 +170,7 @@ def extract_regiao(timer: func.TimerRequest) -> None:
     except Exception as e:
 
         logging.error(
-            f"[entrega] Erro: {e}"
+            f"[regiao] Erro: {e}"
         )
 
         raise
