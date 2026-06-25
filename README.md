@@ -63,6 +63,9 @@ O diagrama de containers detalha a arquitetura interna da solução:
   * Azure Blob Storage
   * Azure SQL Database
 * Power BI
+  <img width="1465" height="820" alt="image" src="https://github.com/user-attachments/assets/038d98b1-33e8-4fad-b956-77877bfd4c2c" />
+
+
 * Python
 
 ---
