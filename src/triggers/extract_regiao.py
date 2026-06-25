@@ -118,9 +118,9 @@ def extract_regiao(timer: func.TimerRequest) -> None:
             )
 
             # limpa os registros antigos
-            cursor_dest.execute(
-                "DELETE FROM dbo.regiao"
-            )
+            #cursor_dest.execute(
+            #    "DELETE FROM dbo.regiao"
+            #)
 
             # habilita IDENTITY
             cursor_dest.execute(
