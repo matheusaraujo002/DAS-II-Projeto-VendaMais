@@ -11,7 +11,7 @@ app = func.Blueprint()
     arg_name="timer",
     run_on_startup=False
 )
-def extract_categoria_produto(timer: func.TimerRequest) -> None:
+def extract_estoque_movimentacao(timer: func.TimerRequest) -> None:
 
     # Banco Cris
     sql_server = os.getenv("SQL_SERVER_SOURCE")
